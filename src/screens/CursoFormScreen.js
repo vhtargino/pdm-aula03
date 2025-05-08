@@ -1,7 +1,8 @@
-import { View, Text } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, Alert, Button, TextInput, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { db } from '../config/firebaseConfig'
-import { getDoc } from 'firebase/firestore'
+import { getDoc, doc } from 'firebase/firestore'
+import { adicionarCurso, atualizarCurso } from '../services/CursoService'
 
 const CursoFormScreen = ({ route, navigation }) => {
 
@@ -24,10 +25,47 @@ const CursoFormScreen = ({ route, navigation }) => {
             buscarCurso()
         }
     }, [itemId])
-    
+
+    const handleSalvar = async () => {
+        if (!nome || !descricao) {
+            Alert.alert('Erro', 'Preencha todos os campos')
+            return
+        }
+        try {
+            if (editando) {
+                await atualizarCurso(itemId, { name: nome, description: descricao })
+                Alert.alert('Curso atualizado com sucesso!')
+            } else {
+                await adicionarCurso({ name: nome, description: descricao })
+                Alert.alert('Curso criado com sucesso!')
+            }
+            navigation.goBack()
+        } catch (error) {
+            Alert.alert('Algo deu errado ao salvar!')
+        }
+    }
+
     return (
-        <View>
-            <Text>CursoFormScreen</Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>
+                {editando ? 'Editar Curso' : 'Adicionar curso'}
+            </Text>
+            <TextInput
+                placeholder='Nome do curso'
+                style={styles.input}
+                value={nome}
+                onChangeText={setNome}
+            />
+            <TextInput
+                placeholder='Descrição do curso'
+                style={styles.input}
+                value={descricao}
+                onChangeText={setDescricao}
+            />
+            <Button 
+                title={editando ? 'Salvar alterações' : 'Criar curso'}
+                onPress={handleSalvar}
+            />
         </View>
     )
 }

@@ -23,6 +23,6 @@ export const atualizarCurso = async (id, novosDados) => {
 
 // D
 export const deletarCurso = async (id) => {
-    const cursoRef = doc(db, 'curso', id)
+    const cursoRef = doc(db, 'cursos', id)
     await deleteDoc(cursoRef)
 }
