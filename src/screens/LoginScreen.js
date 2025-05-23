@@ -1,46 +1,65 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Button } from 'react-native'
-import { React, useState } from 'react'
+import { View, Text, StyleSheet, TextInput, Button, TouchableOpacity, Alert } from 'react-native'
+import React, { useContext } from 'react'
+import { useState } from 'react'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../config/firebaseConfig'
+import { AuthContext } from '../context/AuthContext'
 
 const LoginScreen = ({ navigation }) => {
-    
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
 
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const { user } = useContext(AuthContext)
+
+    const handleLogin = async () => {
+        try {
+            await signInWithEmailAndPassword(auth, email, password)
+            navigation.replace('Main')
+        } catch (error) {
+            Alert.alert('Erro', 'E-mail ou senha inválido')
+        }
+    }
 
     return (
         <View style={styles.container}>
-
             <Text style={styles.title}>🔐 Login</Text>
 
             <TextInput
+                placeholder="Digite seu e-mail"
                 style={styles.input}
-                placeholder="Digite seu nome"
-                value={username}
-                onChangeText={setUsername}
+                value={email}
+                onChangeText={setEmail}
             />
 
             <TextInput
-                style={styles.input}
                 placeholder="Digite sua senha"
+                style={styles.input}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
             />
 
-            <Button title="Entrar" onPress={() => navigation.replace('Main')}/>
+            <Button title="Entrar" onPress={handleLogin} />
+
+            <Text style={styles.orText}>Ainda não tem conta?</Text>
+            <Button title='Cadastre-se' onPress={() => navigation.navigate('Register')} />
+
 
             <Text style={styles.orText}>Ou entre com</Text>
 
+            {/* Botão do Google */}
             <TouchableOpacity style={styles.socialButton}>
                 <AntDesign name="google" size={24} color="white" />
                 <Text style={styles.socialText}>Entrar com Google</Text>
             </TouchableOpacity>
 
+            {/* Botão do Github */}
             <TouchableOpacity style={[styles.socialButton, styles.githubButton]}>
-                <Ionicons name="logo-github" size={24} color="white"/>
-                <Text style={styles.socialText}>Entrar com Github</Text>
+                <Ionicons name="logo-github" size={24} color="white" />
+                <Text style={styles.socialText}>Entre com o github</Text>
             </TouchableOpacity>
+
         </View>
     )
 }
@@ -54,5 +73,6 @@ const styles = StyleSheet.create({
     socialText: { color: 'white', fontSize: 16, marginLeft: 10 },
     githubButton: { backgroundColor: '#333' }
 })
+
 
 export default LoginScreen
